@@ -56,28 +56,88 @@ else
 
 ### 实现
 
-伪代码：
+代码：
 
 ```text
-bool toposort() {
-	q = new queue();
-	for (i = 0; i < n; i++)
-		if (in_deg[i] == 0) q.push(i);
-	ans = new vector();
-	while (!q.empty()) {
-		u = q.pop();
-		ans.push_back(u);
-		for each edge(u, v) {
-			if (--in_deg[v] == 0) q.push(v);
-		}
-	}
-	if (ans.size() == n) {
-		for (i = 0; i < n; i++)
-			std::cout << ans[i] << std::endl;
-		return true;
-	} else {
-		return false;
-	}
+#include <stdio.h>
+#include <vector>
+#include <queue>
+using namespace std;
+
+int n, m, re[505], degree[505];
+vector<int> a[505];
+
+void init()
+{
+    for (int i = 0; i <= n; i++)
+    {
+        a[i].clear();
+        degree[i] = 0;
+        re[i] = 0;
+    }
+}
+
+int topu()
+{
+    int x, y, k = 0, cnt = 0, flag = 0;
+    priority_queue<int, vector<int>, greater<int>> que;
+    while (!que.empty())
+        que.pop();
+    for (int i = 1; i <= n; i++)
+    {
+        if (!degree[i])
+            que.push(i);
+    }
+    while (!que.empty())
+    {
+        if (que.size() > 1)
+            flag = 1;
+        x = que.top();
+        re[++k] = x;
+        que.pop();
+        for (int i = 0; i < a[x].size(); i++)
+        {
+            y = a[x][i];
+            degree[y]--;
+            if (!degree[y])
+            {
+                que.push(y);
+                cnt++;
+            }
+        }
+    }
+    if (cnt != n - 1) ///有环
+        return -1;
+    if (flag) /// size>1 存在多个度相同的点，无法确定关系
+        return 0;
+    else ///关系确定
+    {
+        for (int i = 1; i <= n; i++)
+        {
+            if (i == n)
+                printf("%d\n", re[i]);
+            else
+                printf("%d ", re[i]);
+        }
+        return 1;
+    }
+}
+
+int main()
+{
+    int x, y;
+    while (~scanf("%d%d", &n, &m))
+    {
+        init();
+        while (m--)
+        {
+            scanf("%d%d", &x, &y);
+            a[x].push_back(y);
+            degree[y]++;
+        }
+        int flag = topu();
+    }
+    return 0;
 }
 ```
 
